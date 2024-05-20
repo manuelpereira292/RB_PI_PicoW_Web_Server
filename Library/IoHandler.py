@@ -1,13 +1,12 @@
-import onewire, ds18x20, binascii, ubinascii
-import utime as time
-from machine import Pin, ADC, PWM, UART, I2C
+import onewire, ds18x20, binascii, ubinascii # type: ignore
+import utime as time # type: ignore
+from machine import Pin, ADC, PWM, UART, I2C # type: ignore
 from Library.ads1x15 import ADS1115
 from Library.micropyGPS import MicropyGPS
 
 
 # Class to handle the IO
 class IoHandler:
-
     # OnBoard Led
     led = Pin("LED", Pin.OUT, value=0)
     # OnBoard Temperature
@@ -50,204 +49,260 @@ class IoHandler:
     Vbat = ADC(28)
     # ADC3 - VSYS - Vsys = ADC(29)
 
-    # Initial State
+    emoji_scanning = '&#128257;'
+    emoji_stop = '&#9940;'
+    emoji_car = '&#128663;'
+    emoji_open = '&#128275;'
+    emoji_close = '&#128274;'
+    emoji_pressed = '&#128307;'
+    emoji_not_pressed = '&#128306;'
+    emoji_can_found = '&#128201;'
+    emoji_can_lost = '&#128200;'
+    emoji_buzzer = '&#128276;'
+    emoji_no_buzzer = '&#128277;'
+    emoji_first = '&#129351;'
+    emoji_second = '&#129352;'
+    emoji_third = '&#129353;'
+    
     coloured_states = [0, 0, 0, 0]
-    Initial_State = 'Scanning'
-    lockOpen = '&#128275;'
-    lockClose = '&#128274;'
     
-    vrValue = Initial_State
-    amValue = Initial_State
-    canhValue = Initial_State
-    canlValue = Initial_State
-    canValue = Initial_State 
-    gpsValue = Initial_State 
-    onewireValue = Initial_State
-    ds18x20Value = Initial_State
-    brValue = Initial_State
-    ctValue = Initial_State
-    azValue = Initial_State
-    rsValue = Initial_State
-    
-    vr_stat =      True
-    am_stat =      False
-    canh_stat =    False
-    canl_stat =    False
-    can_stat =     False
-    gps_stat =     False
-    onewire_stat = False
-    ds18x20_stat = False
-    br_stat =      False
-    ct_stat =      False
-    az_stat =      False
-    rs_stat =      False
+    # Initial State
+    dict_lock = {
+        'Power': True,
+        'Ignition': True,
+        'CANh': True,
+        'CANl': True,
+        'CAN': True,
+        'GPS': True,
+        'OneWire': True,
+        'Temp': True,
+        'Fuel': True,
+        'Door': True,
+        'Panic': True,
+        'UDB': True,
+        'SI': True,
+        'Immo': True,
+        'BOut': False,
+        'BIn': False}
 
-    vr_st =      lockOpen
-    am_st =      lockClose
-    canh_st =    lockClose
-    canl_st =    lockClose
-    can_st =     lockClose
-    gps_st =     lockClose
-    onewire_st = lockClose
-    ds18x20_st = lockClose
-    br_st =      lockClose
-    ct_st =      lockClose
-    az_st =      lockClose
-    rs_st =      lockClose
+    dict_data = {
+        'Power': emoji_scanning,
+        'Ignition': emoji_scanning,
+        'CANh': emoji_scanning,
+        'CANl': emoji_scanning,
+        'CAN': emoji_scanning,
+        'GPS': emoji_scanning,
+        'OneWire': emoji_scanning,
+        'Temp': emoji_scanning,
+        'Fuel': emoji_scanning,
+        'Door': emoji_scanning,
+        'Panic': emoji_scanning,
+        'UDB': emoji_scanning}
+
+    dict_info = {
+        'Power': 'Scanning',
+        'Ignition': 'Scanning',
+        'CANh': 'Scanning',
+        'CANl': 'Scanning',
+        'CAN': 'Scanning',
+        'GPS': 'Scanning',
+        'OneWire': 'Scanning',
+        'Temp': 'Scanning',
+        'Fuel': 'Scanning',
+        'Door': 'Scanning',
+        'Panic': 'Scanning',
+        'UDB': 'Scanning',
+        'SI': 'Scanning',
+        'Immo': 'Scanning',
+        'BOut': 'Scanning',
+        'BIn': 'Scanning'}
+
+    dict_emoji = {
+        'Power': emoji_open,
+        'Ignition': emoji_open,
+        'CANh': emoji_open,
+        'CANl': emoji_open,
+        'CAN': emoji_open,
+        'GPS': emoji_open,
+        'OneWire': emoji_open,
+        'Temp': emoji_open,
+        'Fuel': emoji_open,
+        'Door': emoji_open,
+        'Panic': emoji_open,
+        'UDB': emoji_open,
+        'SI': emoji_open,
+        'Immo': emoji_open,
+        'BOut': emoji_no_buzzer,
+        'BIn': emoji_no_buzzer}
 
 
     # Get everything into a starting state
     def __init__(self):
-        # Voltage Sensors
-        self.__class__.get_vr_reading()
-        self.__class__.get_am_reading()
-        self.__class__.get_canh_reading()
-        self.__class__.get_canl_reading()
-        self.__class__.get_br_reading()
-        self.__class__.get_ct_reading()
-        # Botões, Relés, Buzzer
-        self.__class__.get_az_reading()
-        self.__class__.get_rs_reading()
+        self.__class__.Get_Power_Reading()
+        self.__class__.Get_Ignition_Reading()
+        self.__class__.Get_CANh_Reading()
+        self.__class__.Get_CANl_Reading()
+        self.__class__.Get_CAN_Reading()
+        self.__class__.Get_GPS_Reading()
+        self.__class__.Get_OneWire_Reading()
+        self.__class__.Get_Temp_Reading()
+        self.__class__.Get_Fuel_Reading()
+        self.__class__.Get_Door_Reading()
+        self.__class__.Get_Panic_Reading()
+        self.__class__.Get_UDB_Reading()
+
         self.__class__.show_coloured_leds()
-        # CAN, GPS, DriverID
-        self.__class__.get_can_reading()
-        self.__class__.get_gps_reading()
-        self.__class__.get_onewire_reading()
-        self.__class__.get_ds18x20_reading()
-        # Sensores internos
         self.__class__.get_vbat_reading()
         self.__class__.get_pot_reading()
         self.__class__.get_temperature_reading()
         self.__class__.get_time_reading()
                 
 
-    # Power GET
+    # «««««««««««««««««««« G E T »»»»»»»»»»»»»»»»»»»»
+    
     @classmethod
-    def get_vr_reading(cls):
-        return cls.vrValue
+    def Get_Power_Reading(cls):
+        return cls.dict_data['Power']
 
 
-    # Power SET
     @classmethod
-    def set_vr_reading(cls):
-        if cls.vr_stat:
-            _vr_Value = cls.adc_0.read(4, 1)
-            _vr_Value = cls.convert_voltage(_vr_Value)
-            cls.vrValue = str(round(_vr_Value, 2)) + 'V'
-            return cls.vrValue
-
-
-    # Ignition GET
-    @classmethod
-    def get_am_reading(cls):
-        return cls.amValue
+    def Get_Ignition_Reading(cls):
+        return cls.dict_data['Ignition']
     
 
-    # Ignition SET
     @classmethod
-    def set_am_reading(cls):
-        if cls.am_stat:
-            _am_Value = cls.adc_0.read(4, 0)
-            _am_Value = cls.convert_voltage(_am_Value)
-            cls.amValue = str(round(_am_Value, 2)) + 'V'
-            return cls.amValue
+    def Get_CANh_Reading(cls):
+        return cls.dict_data['CANh']
 
 
-    # CAN h GET
     @classmethod
-    def get_canh_reading(cls):
-        return cls.canhValue
+    def Get_CANl_Reading(cls):
+        return cls.dict_data['CANl']
+        
+
+    @classmethod
+    def Get_CAN_Reading(cls):
+        return cls.dict_data['CAN']
     
 
-    # CAN h SET
     @classmethod
-    def set_canh_reading(cls):
-        if cls.canh_stat:
-            _canh_Value = cls.adc_1.read(4, 1)
-            _canh_Value = cls.convert_voltage(_canh_Value)
-            cls.canhValue = str(round(_canh_Value, 2)) + 'V'
-            return cls.canhValue
+    def Get_GPS_Reading(cls):
+        return cls.dict_data['GPS']
 
 
-    # CAN l GET
     @classmethod
-    def get_canl_reading(cls):
-        return cls.canlValue
+    def Get_OneWire_Reading(cls):
+        return cls.dict_data['OneWire']
+
+
+    @classmethod
+    def Get_Temp_Reading(cls):
+        return cls.dict_data['Temp']
+
+
+    @classmethod
+    def Get_Fuel_Reading(cls):
+        return cls.dict_data['Fuel']
+
+
+    @classmethod
+    def Get_Door_Reading(cls):
+        return cls.dict_data['Door']
+
+
+    @classmethod
+    def Get_Panic_Reading(cls):
+        return cls.dict_data['Panic']
     
 
-    # CAN l SET
     @classmethod
-    def set_canl_reading(cls):
-        if cls.canl_stat:
-            _canl_Value = cls.adc_1.read(4, 2)
-            _canl_Value = cls.convert_voltage(_canl_Value)
-            cls.canlValue = str(round(_canl_Value, 2)) + 'V'
-            return cls.canlValue
+    def Get_UDB_Reading(cls):
+        return cls.dict_data['UDB']
 
 
-    # CanBus GET
+    # «««««««««««««««««««« S E T »»»»»»»»»»»»»»»»»»»»
+    
     @classmethod
-    def get_can_reading(cls):
-        return cls.canValue
+    def Set_Power_Reading(cls):
+        if cls.dict_lock['Power']:
+            _value = cls.adc_0.read(4, 1)
+            _value = cls.convert_voltage(_value)
+            cls.dict_data['Power'] = str(round(_value, 2)) + 'V'
+
+
+    @classmethod
+    def Set_Ignition_Reading(cls):
+        if cls.dict_lock['Ignition']:
+            _value = cls.adc_0.read(4, 0)
+            _value = cls.convert_voltage(_value)
+            cls.dict_data['Ignition'] = str(round(_value, 2)) + 'V'
     
 
-    # CanBus SET
     @classmethod
-    def set_can_reading(cls):
-        if cls.can_stat:
-            cls.canValue = 'Can Lost'
-            _rxData = bytes()
+    def Set_CANh_Reading(cls):
+        if cls.dict_lock['CANh']:
+            _value = cls.adc_1.read(4, 1)
+            _value = cls.convert_voltage(_value)
+            cls.dict_data['CANh'] = str(round(_value, 2)) + 'V'
+
+
+    @classmethod
+    def Set_CANl_Reading(cls):
+        if cls.dict_lock['CANl']:
+            _value = cls.adc_1.read(4, 2)
+            _value = cls.convert_voltage(_value)
+            cls.dict_data['CANl'] = str(round(_value, 2)) + 'V'
+
+
+    @classmethod
+    def Set_CAN_Reading(cls):
+        if cls.dict_lock['CAN']:
+            cls.dict_data['CAN'] = cls.emoji_can_lost
+            _value = bytes()
             try:
-                _rxData = cls.uart_1.read(500)
-                if _rxData != None:
-                    cls.canValue = 'Can Found'
-                    _rxData = ubinascii.hexlify(_rxData, ' ')
+                _value = cls.uart_1.read(500)
+                if _value != None:
+                    cls.dict_data['CAN'] = cls.emoji_can_found
+                    _value = ubinascii.hexlify(_value, ' ')
                     with open('/Logs/can.txt', 'a') as outfile:
-                        outfile.write(cls.get_time_reading() + '\n' + str(_rxData) + '\r\n')
+                        outfile.write(cls.get_time_reading() + '\n' + str(_value) + '\r\n')
             except UnicodeError:
                 pass
-    
 
-    # GPS GET
+
     @classmethod
-    def get_gps_reading(cls):
-        return cls.gpsValue
-
-
-    # GPS SET
-    @classmethod
-    def set_gps_reading(cls):
-        if cls.gps_stat: 
-            _rxData = bytes()
+    def Set_GPS_Reading(cls):
+        if cls.dict_lock['GPS']:
+            _value = bytes()
             try:
-                _rxData = cls.uart_0.read(500)
-                if _rxData != None:
-                    _rxData = str(_rxData.decode('utf-8'))
-                    _rxData = _rxData.splitlines()
-                    if len(_rxData) == 5:
-                        for x in range(len(_rxData)):
-                            if _rxData[x][0:6] == '$GPRMC':
-                                _GPRMC = str(_rxData[x])
+                _value = cls.uart_0.read(500)
+                if _value != None:
+                    _value = str(_value.decode('utf-8'))
+                    _value = _value.splitlines()
+                    if len(_value) == 5:
+                        for x in range(len(_value)):
+                            if _value[x][0:6] == '$GPRMC':
+                                _GPRMC = str(_value[x])
                                 for y in _GPRMC:
                                     cls.gps.update(y)
-                            elif _rxData[x][0:6] == '$GPVTG':
-                                _GPVTG = str(_rxData[x])
+                            elif _value[x][0:6] == '$GPVTG':
+                                _GPVTG = str(_value[x])
                                 for y in _GPVTG:
                                     cls.gps.update(y)
-                            elif _rxData[x][0:6] == '$GPGGA':
-                                _GPGGA = str(_rxData[x])
+                            elif _value[x][0:6] == '$GPGGA':
+                                _GPGGA = str(_value[x])
                                 for y in _GPGGA:
                                     cls.gps.update(y)
-                            elif _rxData[x][0:6] == '$GPGSA':
-                                _GPGSA = str(_rxData[x])
+                            elif _value[x][0:6] == '$GPGSA':
+                                _GPGSA = str(_value[x])
                                 for y in _GPGSA:
                                     cls.gps.update(y)
-                            elif _rxData[x][0:6] == '$GPGSV':
-                                _GPGSV = str(_rxData[x])
+                            elif _value[x][0:6] == '$GPGSV':
+                                _GPGSV = str(_value[x])
                                 for y in _GPGSV:
                                     cls.gps.update(y)
-                            elif _rxData[x][0:6] == '$GPGLL':
-                                _GPGLL = str(_rxData[x])
+                            elif _value[x][0:6] == '$GPGLL':
+                                _GPGLL = str(_value[x])
                                 for y in _GPGLL:
                                     cls.gps.update(y)
                             else:
@@ -255,54 +310,22 @@ class IoHandler:
                                     pass
                                 else:
                                     with open('/Logs/gps.txt', 'a') as outfile:
-                                        outfile.write(cls.get_time_reading() + ' ' + str(x) + '_FAILL -> ' + _rxData[x] + '\n')
+                                        outfile.write(cls.get_time_reading() + ' ' + str(x) + '_FAILL -> ' + _value[x] + '\n')
             except UnicodeError:
                 pass
         
             if cls.gps.fix_type == 3:
-                cls.gpsValue = ('3D Fix / ' + str(cls.gps.satellites_in_use) + ' Sat')
+                cls.dict_data['GPS'] = ('3D Fix / ' + str(cls.gps.satellites_in_use) + ' Sat')
                 #cls.get_gps_logging()
             elif cls.gps.fix_type == 2:
-                cls.gpsValue = ('2D Fix / ' + str(cls.gps.satellites_in_use) + ' Sat')
+                cls.dict_data['GPS'] = ('2D Fix / ' + str(cls.gps.satellites_in_use) + ' Sat')
             else:
-                cls.gpsValue = 'no Fix'
+                cls.dict_data['GPS'] = 'no Fix'
 
 
-    # GPS Logging
     @classmethod
-    def get_gps_logging(cls):
-        cls.gps.start_logging('/Logs/gps_logging.txt')
-        cls.gps.write_log('Latitude      : ' + str(cls.gps.latitude_string()) + '\r\n')
-        cls.gps.write_log('Longitude     : ' + str(cls.gps.longitude_string()) + '\r\n')
-        cls.gps.write_log('Altitude      : ' + str(cls.gps.altitude) + '\r\n')
-        cls.gps.write_log('Km/h          : ' + str(cls.gps.speed_string('kph')) + '\r\n')
-        cls.gps.write_log('Compass       : ' + str(cls.gps.compass_direction()) + '\r\n')
-        cls.gps.write_log('Date1         : ' + str(cls.gps.date_string('long')) + '\r\n')
-        cls.gps.write_log('Date2         : ' + str(cls.gps.date_string('s_dmy')) + '\r\n')
-        cls.gps.write_log('Time Since Fix: ' + str(cls.gps.time_since_fix()) + '\r\n')
-        cls.gps.write_log('No Satellites : ' + str(cls.gps.satellites_in_use) + '\r\n')
-        cls.gps.write_log('Satellites    : ' + str(cls.gps.satellites_used) + '\r\n')
-        cls.gps.write_log('Fix type      : ' + str(cls.gps.fix_type) + '\r\n')
-        cls.gps.write_log('\r\n')
-        cls.gps.stop_logging()
-
-
-    # OneWire GET
-    @classmethod
-    def get_onewire_reading(cls):
-        return cls.onewireValue
-        
-
-    # DS18x20 GET
-    @classmethod
-    def get_ds18x20_reading(cls):
-        return cls.ds18x20Value
-
-
-    # OneWire / DS18x20 SET
-    @classmethod
-    def set_onewire_reading(cls):
-        if cls.onewire_stat: 
+    def Set_OneWire_Reading(cls):
+        if cls.dict_lock['OneWire']:
             ow_info = cls.ow.scan() # OneWire
             ow_list = []
             ds_info = cls.ds.scan() # DS18x20
@@ -324,25 +347,24 @@ class IoHandler:
             try:
                 x = set(ow_list) & set(ds_list)
                 if len(x) == 0:
-                    cls.ds18x20Value = cls.Initial_State
+                    cls.dict_data['Temp']= cls.emoji_scanning
                 else:
-                    cls.ds18x20Value = (str(len(x)) + 'S -> ' + ' / '.join(temp_list))
+                    cls.dict_data['Temp'] = (str(len(x)) + 'S -> ' + ' / '.join(temp_list))
                     #with open('/Logs/ds18x20.txt', 'a') as outfile:
                     #    outfile.write(cls.get_time_reading() + ' ' + str(ds_list) + ' ' + cls.ds18x20Value + '\n')
 
                 y = set(ow_list) ^ set(ds_list)
                 if len(y) == 0:
-                    cls.onewireValue = cls.Initial_State
+                    cls.dict_data['OneWire'] = cls.emoji_scanning
                 else:
-                    cls.onewireValue = ''.join(y)
-                    with open('/Logs/onewire.txt', 'a') as outfile:
-                        outfile.write(cls.get_time_reading() + ' ' + cls.onewireValue + '\n')
+                    cls.dict_data['OneWire'] = ''.join(y)
+                    #with open('/Logs/onewire.txt', 'a') as outfile:
+                    #    outfile.write(cls.get_time_reading() + ' ' + cls.onewireValue + '\n')
                     cls.buzzer_out_play()
             except:
                 pass
 
 
-    # Decode OneWire FUNCTION
     @classmethod
     def decode_onewire(cls, info):
         byte_var = binascii.hexlify(info).decode().upper()
@@ -359,73 +381,42 @@ class IoHandler:
             print('Found OneWire devices with 16 bits error')
             return None
 
+
+    @classmethod
+    def Set_Fuel_Reading(cls):
+        if cls.dict_lock['Fuel']:
+            _value = cls.adc_1.read(4, 0)
+            _value = cls.convert_voltage(_value)
+            cls.dict_data['Fuel'] = str(round(_value, 2)) + 'V'
     
-    # Fuel Level GET
+
+
     @classmethod
-    def get_br_reading(cls):
-        return cls.brValue
-
-
-    # Fuel Level SET
-    @classmethod
-    def set_br_reading(cls):
-        if cls.br_stat: 
-            _br_Value = cls.adc_1.read(4, 0)
-            _br_Value = cls.convert_voltage(_br_Value)
-            cls.brValue = str(round(_br_Value, 2)) + 'V'
-            return cls.brValue
-
-
-    # Door Sensor GET
-    @classmethod
-    def get_ct_reading(cls):
-        return cls.ctValue
-
-
-    # Door Sensor SET
-    @classmethod
-    def set_ct_reading(cls):
-        if cls.ct_stat: 
-            _ct_Value = cls.adc_0.read(4, 2)
-            _ct_Value = cls.convert_voltage(_ct_Value)
-            cls.ctValue = str(round(_ct_Value, 2)) + 'V'
-            return cls.ctValue
-
-
-    # Panic Button GET
-    @classmethod
-    def get_az_reading(cls):
-        return cls.azValue
+    def Set_Door_Reading(cls):
+        if cls.dict_lock['Door']:
+            _value = cls.adc_0.read(4, 2)
+            _value = cls.convert_voltage(_value)
+            cls.dict_data['Door'] = str(round(_value, 2)) + 'V'
 
     
-    # Panic Button SET
     @classmethod
-    def set_az_reading(cls):
-        if cls.az_stat: 
+    def Set_Panic_Reading(cls):
+        if cls.dict_lock['Panic']:
             if cls.panic.value() == 0:
-                cls.azValue = 'Pressed'
+                cls.dict_data['Panic'] = cls.emoji_pressed
                 cls.buzzer_out_play()
             else:
-                cls.azValue = cls.Initial_State
-            return cls.azValue
+                cls.dict_data['Panic'] = cls.emoji_not_pressed
     
-    
-    # Unauthorized Driver Button GET
+        
     @classmethod
-    def get_rs_reading(cls):
-        return cls.rsValue
-    
-
-    # Unauthorized Driver Button SET
-    @classmethod
-    def set_rs_reading(cls):
-        if cls.rs_stat: 
+    def Set_UDB_Reading(cls):
+        if cls.dict_lock['UDB']:
             if cls.ewt.value() == 0:
-                cls.rsValue = 'Pressed'
+                cls.dict_data['UDB'] = cls.emoji_pressed
                 cls.buzzer_out_play()
             else:
-                cls.rsValue = cls.Initial_State
-            return cls.rsValue
+                cls.dict_data['UDB'] = cls.emoji_not_pressed
 
 
     # Start Inhibit / Immobilization / Buzzer Out / Buzzer In SET
@@ -581,15 +572,130 @@ class IoHandler:
             time.sleep_ms(150)
 
 
-    # Lock Status
     @classmethod
-    def lock_status(cls, state):
-        print(state)
-        """
-        if state[0] == 1:
-            cls.vr_stat = not cls.vr_stat
-            if cls.vr_stat:
-                cls.vr_st = '-1-'
+    def Set_Switches_Reading(cls, value):
+        status = 'OK'
+        if value == 'Power':
+            cls.dict_lock['Power'] = not cls.dict_lock['Power']
+            if cls.dict_lock['Power']:
+                cls.dict_emoji['Power'] = cls.emoji_open
             else:
-                cls.vr_st = '-0-'
-        """
+                cls.dict_emoji['Power'] = cls.emoji_close
+        elif value == 'Ignition':
+            cls.dict_lock['Ignition'] = not cls.dict_lock['Ignition']
+            if cls.dict_lock['Ignition']:
+                cls.dict_emoji['Ignition'] = cls.emoji_open
+            else:
+                cls.dict_emoji['Ignition'] = cls.emoji_close
+        elif value == 'CANh':
+            cls.dict_lock['CANh'] = not cls.dict_lock['CANh']
+            if cls.dict_lock['CANh']:
+                cls.dict_emoji['CANh'] = cls.emoji_open
+            else:
+                cls.dict_emoji['CANh'] = cls.emoji_close
+        elif value == 'CANl':
+            cls.dict_lock['CANl'] = not cls.dict_lock['CANl']
+            if cls.dict_lock['CANl']:
+                cls.dict_emoji['CANl'] = cls.emoji_open
+            else:
+                cls.dict_emoji['CANl'] = cls.emoji_close
+        elif value == 'CAN':
+            cls.dict_lock['CAN'] = not cls.dict_lock['CAN']
+            if cls.dict_lock['CAN']:
+                cls.dict_emoji['CAN'] = cls.emoji_open
+            else:
+                cls.dict_emoji['CAN'] = cls.emoji_close
+        elif value == 'GPS':
+            cls.dict_lock['GPS'] = not cls.dict_lock['GPS']
+            if cls.dict_lock['GPS']:
+                cls.dict_emoji['GPS'] = cls.emoji_open
+            else:
+                cls.dict_emoji['GPS'] = cls.emoji_close
+        elif value == 'OneWire':
+            cls.dict_lock['OneWire'] = not cls.dict_lock['OneWire']
+            if cls.dict_lock['OneWire']:
+                cls.dict_emoji['OneWire'] = cls.emoji_open
+            else:
+                cls.dict_emoji['OneWire'] = cls.emoji_close
+        elif value == 'Temp':
+            cls.dict_lock['Temp'] = not cls.dict_lock['Temp']
+            if cls.dict_lock['Temp']:
+                cls.dict_emoji['Temp'] = cls.emoji_open
+            else:
+                cls.dict_emoji['Temp'] = cls.emoji_close
+        elif value == 'Fuel':
+            cls.dict_lock['Fuel'] = not cls.dict_lock['Fuel']
+            if cls.dict_lock['Fuel']:
+                cls.dict_emoji['Fuel'] = cls.emoji_open
+            else:
+                cls.dict_emoji['Fuel'] = cls.emoji_close
+        elif value == 'Door':
+            cls.dict_lock['Door'] = not cls.dict_lock['Door']
+            if cls.dict_lock['Door']:
+                cls.dict_emoji['Door'] = cls.emoji_open
+            else:
+                cls.dict_emoji['Door'] = cls.emoji_close
+        elif value == 'Panic':
+            cls.dict_lock['Panic'] = not cls.dict_lock['Panic']
+            if cls.dict_lock['Panic']:
+                cls.dict_emoji['Panic'] = cls.emoji_open
+            else:
+                cls.dict_emoji['Panic'] = cls.emoji_close
+        elif value == 'UDB':
+            cls.dict_lock['UDB'] = not cls.dict_lock['UDB']
+            if cls.dict_lock['UDB']:
+                cls.dict_emoji['UDB'] = cls.emoji_open
+            else:
+                cls.dict_emoji['UDB'] = cls.emoji_close
+        elif value == 'SI':
+            cls.dict_lock['SI'] = not cls.dict_lock['SI']
+            if cls.dict_lock['SI']:
+                cls.dict_emoji['SI'] = cls.emoji_open
+            else:
+                cls.dict_emoji['SI'] = cls.emoji_close
+        elif value == 'Immo':
+            cls.dict_lock['Immo'] = not cls.dict_lock['Immo']
+            if cls.dict_lock['Immo']:
+                cls.dict_emoji['Immo'] = cls.emoji_open
+            else:
+                cls.dict_emoji['Immo'] = cls.emoji_close
+        elif value == 'BOut':
+            cls.dict_lock['BOut'] = not cls.dict_lock['BOut']
+            if cls.dict_lock['BOut']:
+                cls.dict_emoji['BOut'] = cls.emoji_buzzer
+            else:
+                cls.dict_emoji['BOut'] = cls.emoji_no_buzzer
+        elif value == 'BIn':
+            cls.dict_lock['BIn'] = not cls.dict_lock['BIn']
+            if cls.dict_lock['BIn']:
+                cls.dict_emoji['BIn'] = cls.emoji_buzzer
+            else:
+                cls.dict_emoji['BIn'] = cls.emoji_no_buzzer
+        elif value == 'Reboot':
+            raise RuntimeError
+        elif value == 'POff':
+            raise KeyboardInterrupt
+        else:
+            status = 'Error'
+        return status
+
+
+
+
+    # GPS Logging
+    @classmethod
+    def get_gps_logging(cls):
+        cls.gps.start_logging('/Logs/gps_logging.txt')
+        cls.gps.write_log('Latitude      : ' + str(cls.gps.latitude_string()) + '\r\n')
+        cls.gps.write_log('Longitude     : ' + str(cls.gps.longitude_string()) + '\r\n')
+        cls.gps.write_log('Altitude      : ' + str(cls.gps.altitude) + '\r\n')
+        cls.gps.write_log('Km/h          : ' + str(cls.gps.speed_string('kph')) + '\r\n')
+        cls.gps.write_log('Compass       : ' + str(cls.gps.compass_direction()) + '\r\n')
+        cls.gps.write_log('Date1         : ' + str(cls.gps.date_string('long')) + '\r\n')
+        cls.gps.write_log('Date2         : ' + str(cls.gps.date_string('s_dmy')) + '\r\n')
+        cls.gps.write_log('Time Since Fix: ' + str(cls.gps.time_since_fix()) + '\r\n')
+        cls.gps.write_log('No Satellites : ' + str(cls.gps.satellites_in_use) + '\r\n')
+        cls.gps.write_log('Satellites    : ' + str(cls.gps.satellites_used) + '\r\n')
+        cls.gps.write_log('Fix type      : ' + str(cls.gps.fix_type) + '\r\n')
+        cls.gps.write_log('\r\n')
+        cls.gps.stop_logging()
