@@ -37,41 +37,57 @@ var potOpts = {
 
 // INTRODUZIR DADOS RESPEITAR ORDEM HTML
 var target = document.getElementById('wordGauge');
-
-var target = document.getElementById('vrValue');
 var target = document.getElementById('Emoji_Power');
-var target = document.getElementById('amValue');
+var target = document.getElementById('Data_Power');
+var target = document.getElementById('Info_Power');
 var target = document.getElementById('Emoji_Ignition');
-var target = document.getElementById('canhValue');
+var target = document.getElementById('Data_Ignition');
+var target = document.getElementById('Info_Ignition');
 var target = document.getElementById('Emoji_CANh');
-var target = document.getElementById('canlValue');
+var target = document.getElementById('Data_CANh');
+var target = document.getElementById('Info_CANh');
 var target = document.getElementById('Emoji_CANl');
-var target = document.getElementById('canValue');
+var target = document.getElementById('Data_CANl');
+var target = document.getElementById('Info_CANl');
 var target = document.getElementById('Emoji_CAN');
-var target = document.getElementById('gpsValue');
+var target = document.getElementById('Data_CAN');
+var target = document.getElementById('Info_CAN');
 var target = document.getElementById('Emoji_GPS');
-var target = document.getElementById('onewireValue');
+var target = document.getElementById('Data_GPS');
+var target = document.getElementById('Info_GPS');
 var target = document.getElementById('Emoji_OneWire');
-var target = document.getElementById('ds18x20Value');
+var target = document.getElementById('Data_OneWire');
+var target = document.getElementById('Info_OneWire');
 var target = document.getElementById('Emoji_Temp');
-var target = document.getElementById('brValue');
+var target = document.getElementById('Data_Temp');
+var target = document.getElementById('Info_Temp');
 var target = document.getElementById('Emoji_Fuel');
-var target = document.getElementById('ctValue');
+var target = document.getElementById('Data_Fuel');
+var target = document.getElementById('Info_Fuel');
 var target = document.getElementById('Emoji_Door');
-var target = document.getElementById('azValue');
+var target = document.getElementById('Data_Door');
+var target = document.getElementById('Info_Door');
 var target = document.getElementById('Emoji_Panic');
-var target = document.getElementById('rsValue');
+var target = document.getElementById('Data_Panic');
+var target = document.getElementById('Info_Panic');
 var target = document.getElementById('Emoji_UDB');
+var target = document.getElementById('Data_UDB');
+var target = document.getElementById('Info_UDB');
 var target = document.getElementById('Emoji_SI');
+var target = document.getElementById('Data_SI');
+var target = document.getElementById('Info_SI');
 var target = document.getElementById('Emoji_Immo');
+var target = document.getElementById('Data_Immo');
+var target = document.getElementById('Info_Immo');
 var target = document.getElementById('Emoji_BOut');
+var target = document.getElementById('Data_BOut');
+var target = document.getElementById('Info_BOut');
 var target = document.getElementById('Emoji_BIn');
+var target = document.getElementById('Data_BIn');
+var target = document.getElementById('Info_BIn');
+var target = document.getElementById('Data_Time');
 
-var target = document.getElementById('vbatValue');
-var target = document.getElementById('temperatureValue');
-var target = document.getElementById('timeValue');
 var target = document.getElementById('potGauge');
-
 var gauge = new Gauge(target).setOptions(potOpts);
 gauge.maxValue = 100;
 gauge.minValue = 0;
@@ -138,25 +154,22 @@ function gatherData(){
         $('#wordValue').html(wordPercent);
         
         // INTRODUZIR DADOS RESPEITAR ORDEM HTML
-        $('#vrValue').html(data.vrValue);
-        $('#amValue').html(data.amValue);
-        $('#canhValue').html(data.canhValue);
-        $('#canlValue').html(data.canlValue);
-        $('#canValue').html(data.canValue);
-        $('#gpsValue').html(data.gpsValue);
-        $('#onewireValue').html(data.onewireValue);
-        $('#ds18x20Value').html(data.ds18x20Value);
-        $('#brValue').html(data.brValue);
-        $('#ctValue').html(data.ctValue);
-        $('#azValue').html(data.azValue);
-        $('#rsValue').html(data.rsValue);
-        
-        $('#vbatValue').html(data.vbatValue);
-        $('#temperatureValue').html(data.temperatureValue);
-        $('#timeValue').html(data.timeValue);
+        $('#Data_Power').html(data.Data_Power);
+        $('#Data_Ignition').html(data.Data_Ignition);
+        $('#Data_CANh').html(data.Data_CANh);
+        $('#Data_CANl').html(data.Data_CANl);
+        $('#Data_CAN').html(data.Data_CAN);
+        $('#Data_GPS').html(data.Data_GPS);
+        $('#Data_OneWire').html(data.Data_OneWire);
+        $('#Data_Temp').html(data.Data_Temp);
+        $('#Data_Fuel').html(data.Data_Fuel);
+        $('#Data_Door').html(data.Data_Door);
+        $('#Data_Panic').html(data.Data_Panic);
+        $('#Data_UDB').html(data.Data_UDB);
+        $('#Data_Time').html(data.Data_Time);
         
         // handle gauge
-        potPercent = parseInt(parseInt(data.pot_value) * 100 / 40600);
+        potPercent = parseInt(parseInt(data.Data_Battery) * 100 / 40600);
         gauge.set(potPercent);
         $('#potValue').html(potPercent);
         $('#potValue').removeClass(["bg-success", "bg-warning", "bg-danger"]);
@@ -171,7 +184,7 @@ function gatherData(){
         }
 
         // handle temp gauge
-        temp = parseFloat(data.temp_value);
+        temp = parseFloat(data.Data_Temperature);
         tempGauge.set(temp);
         $('#tempValue').html(temp.toFixed(1));
         $('#tempValue').removeClass(["bg-success", "bg-warning", "bg-danger"]);
@@ -199,21 +212,41 @@ function SetSwitch(value) {
     $.post( "/api", postData, function( data ) {
         console.log(data);
         $('#Emoji_Power').html(data.Emoji_Power);
+        $('#Info_Power').html(data.Info_Power);
         $('#Emoji_Ignition').html(data.Emoji_Ignition);
+        $('#Info_Ignition').html(data.Info_Ignition);
         $('#Emoji_CANh').html(data.Emoji_CANh);
+        $('#Info_CANh').html(data.Info_CANh);
         $('#Emoji_CANl').html(data.Emoji_CANl);
+        $('#Info_CANl').html(data.Info_CANl);
         $('#Emoji_CAN').html(data.Emoji_CAN);
+        $('#Info_CAN').html(data.Info_CAN);
         $('#Emoji_GPS').html(data.Emoji_GPS);
+        $('#Info_GPS').html(data.Info_GPS);
         $('#Emoji_OneWire').html(data.Emoji_OneWire);
+        $('#Info_OneWire').html(data.Info_OneWire);
         $('#Emoji_Temp').html(data.Emoji_Temp);
+        $('#Info_Temp').html(data.Info_Temp);
         $('#Emoji_Fuel').html(data.Emoji_Fuel);
+        $('#Info_Fuel').html(data.Info_Fuel);
         $('#Emoji_Door').html(data.Emoji_Door);
+        $('#Info_Door').html(data.Info_Door);
         $('#Emoji_Panic').html(data.Emoji_Panic);
+        $('#Info_Panic').html(data.Info_Panic);
         $('#Emoji_UDB').html(data.Emoji_UDB);
+        $('#Info_UDB').html(data.Info_UDB);
         $('#Emoji_SI').html(data.Emoji_SI);
+        $('#Data_SI').html(data.Data_SI);
+        $('#Info_SI').html(data.Info_SI);
         $('#Emoji_Immo').html(data.Emoji_Immo);
+        $('#Data_Immo').html(data.Data_Immo);
+        $('#Info_Immo').html(data.Info_Immo);
         $('#Emoji_BOut').html(data.Emoji_BOut);
+        $('#Data_BOut').html(data.Data_BOut);
+        $('#Info_BOut').html(data.Info_BOut);
         $('#Emoji_BIn').html(data.Emoji_BIn);
+        $('#Data_BIn').html(data.Data_BIn);
+        $('#Info_BIn').html(data.Info_BIn);
     });
 }
 

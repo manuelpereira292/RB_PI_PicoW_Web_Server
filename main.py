@@ -23,32 +23,23 @@ async def handle_request(reader, writer):
             action = request.get_action()
             if action == 'readData':
                 # Ajax request for data
-                vbatValue = IoHandler.get_vbat_reading()
-                pot_value = IoHandler.get_pot_reading()
-                temperatureValue = IoHandler.get_temperature_reading()
-                timeValue = IoHandler.get_time_reading()
-                temp_value = IoHandler.get_temp_reading()
-
                 response_obj = {
                     'status': 0,
-                    'vrValue': IoHandler.Get_Power_Reading(),
-                    'amValue': IoHandler.Get_Ignition_Reading(),
-                    'canhValue': IoHandler.Get_CANh_Reading(),
-                    'canlValue': IoHandler.Get_CANl_Reading(),
-                    'canValue': IoHandler.Get_CAN_Reading(),
-                    'gpsValue': IoHandler.Get_GPS_Reading(),
-                    'onewireValue': IoHandler.Get_OneWire_Reading(),
-                    'ds18x20Value': IoHandler.Get_Temp_Reading(),
-                    'brValue': IoHandler.Get_Fuel_Reading(),
-                    'ctValue': IoHandler.Get_Door_Reading(),
-                    'azValue': IoHandler.Get_Panic_Reading(),
-                    'rsValue': IoHandler.Get_UDB_Reading(),
-                    
-                    'vbatValue': vbatValue,
-                    'pot_value': pot_value,
-                    'temperatureValue': temperatureValue,
-                    'timeValue': timeValue,
-                    'temp_value': temp_value}
+                    'Data_Power': IoHandler.Get_Power_Reading(),
+                    'Data_Ignition': IoHandler.Get_Ignition_Reading(),
+                    'Data_CANh': IoHandler.Get_CANh_Reading(),
+                    'Data_CANl': IoHandler.Get_CANl_Reading(),
+                    'Data_CAN': IoHandler.Get_CAN_Reading(),
+                    'Data_GPS': IoHandler.Get_GPS_Reading(),
+                    'Data_OneWire': IoHandler.Get_OneWire_Reading(),
+                    'Data_Temp': IoHandler.Get_Temp_Reading(),
+                    'Data_Fuel': IoHandler.Get_Fuel_Reading(),
+                    'Data_Door': IoHandler.Get_Door_Reading(),
+                    'Data_Panic': IoHandler.Get_Panic_Reading(),
+                    'Data_UDB': IoHandler.Get_UDB_Reading(),
+                    'Data_Battery': IoHandler.Get_Battery_Reading(),
+                    'Data_Temperature': IoHandler.Get_Temperature_Reading(),
+                    'Data_Time': IoHandler.Get_Time_Reading()}
                 
                 response_builder.set_body_from_dict(response_obj)
             
@@ -59,22 +50,41 @@ async def handle_request(reader, writer):
                 response_obj = {
                     'status': IoHandler.Set_Switches_Reading(value),
                     'Emoji_Power': IoHandler.dict_emoji['Power'],
+                    'Info_Power': IoHandler.dict_info['Power'],
                     'Emoji_Ignition': IoHandler.dict_emoji['Ignition'],
+                    'Info_Ignition': IoHandler.dict_info['Ignition'],
                     'Emoji_CANh': IoHandler.dict_emoji['CANh'],
+                    'Info_CANh': IoHandler.dict_info['CANh'],
                     'Emoji_CANl': IoHandler.dict_emoji['CANl'],
+                    'Info_CANl': IoHandler.dict_info['CANl'],
                     'Emoji_CAN': IoHandler.dict_emoji['CAN'],
+                    'Info_CAN': IoHandler.dict_info['CAN'],
                     'Emoji_GPS': IoHandler.dict_emoji['GPS'],
+                    'Info_GPS': IoHandler.dict_info['GPS'],
                     'Emoji_OneWire': IoHandler.dict_emoji['OneWire'],
+                    'Info_OneWire': IoHandler.dict_info['OneWire'],
                     'Emoji_Temp': IoHandler.dict_emoji['Temp'],
+                    'Info_Temp': IoHandler.dict_info['Temp'],
                     'Emoji_Fuel': IoHandler.dict_emoji['Fuel'],
+                    'Info_Fuel': IoHandler.dict_info['Fuel'],
                     'Emoji_Door': IoHandler.dict_emoji['Door'],
+                    'Info_Door': IoHandler.dict_info['Door'],
                     'Emoji_Panic': IoHandler.dict_emoji['Panic'],
+                    'Info_Panic': IoHandler.dict_info['Panic'],
                     'Emoji_UDB': IoHandler.dict_emoji['UDB'],
+                    'Info_UDB': IoHandler.dict_info['UDB'],
                     'Emoji_SI': IoHandler.dict_emoji['SI'],
+                    'Data_SI': IoHandler.dict_data['SI'],
+                    'Info_SI': IoHandler.dict_info['SI'],
                     'Emoji_Immo': IoHandler.dict_emoji['Immo'],
+                    'Data_Immo': IoHandler.dict_data['Immo'],
+                    'Info_Immo': IoHandler.dict_info['Immo'],
                     'Emoji_BOut': IoHandler.dict_emoji['BOut'],
+                    'Data_BOut': IoHandler.dict_data['BOut'],
+                    'Info_BOut': IoHandler.dict_info['BOut'],
                     'Emoji_BIn': IoHandler.dict_emoji['BIn'],
-                    }
+                    'Data_BIn': IoHandler.dict_data['BIn'],
+                    'Info_BIn': IoHandler.dict_info['BIn']}
                 
                 response_builder.set_body_from_dict(response_obj)
 
@@ -114,7 +124,6 @@ async def handle_request(reader, writer):
 
 # coroutine that will run as the neopixel update task
 async def neopixels():
-
     counter = 0
     while True:
         if counter % 1000 == 0:
@@ -126,6 +135,9 @@ async def neopixels():
             IoHandler.Set_Door_Reading()
             IoHandler.Set_Panic_Reading()
             IoHandler.Set_UDB_Reading()
+            IoHandler.Set_Battery_Reading()
+            IoHandler.Set_Temperature_Reading()
+            IoHandler.Set_Time_Reading()
 
         counter += 1
         # 0 second pause to allow other tasks to run
@@ -138,7 +150,7 @@ async def main():
     print('Setting up webserver...')
     server = uasyncio.start_server(handle_request, "0.0.0.0", 80)
     uasyncio.create_task(server)
-    #IoHandler.buzzer_in_play()
+    IoHandler.buzzer_in_play()
     IoHandler.led.on()
 
     # start top 4 neopixel updating task
@@ -160,7 +172,7 @@ try:
     uasyncio.run(main())
 except KeyboardInterrupt:
     print('Stop button')
-    #IoHandler.buzzer_in_play()
+    IoHandler.buzzer_in_play()
     IoHandler.led.off()
     sys.exit()
 finally:

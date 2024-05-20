@@ -1,8 +1,7 @@
 from Library.NetworkCredentials import NetworkCredentials
-from rp2 import country
-import utime as time
-import ntptime
-import network
+from rp2 import country # type: ignore
+import utime as time # type: ignore
+import ntptime, network # type: ignore
 
 
 # class to handle WiFi conenction
@@ -29,8 +28,8 @@ class WiFiConnection:
         # Change Country
         country('PT')
         # connect to wifi network
-        ssid = NetworkCredentials.ssid1
-        password = NetworkCredentials.password1
+        ssid = NetworkCredentials.ssid2
+        password = NetworkCredentials.password2
         cls.wlan.connect(ssid, password)
         cls.status = network.STAT_CONNECTING
         if print_progress:
