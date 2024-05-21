@@ -32,59 +32,76 @@ var potOpts = {
         subWidth: 0.6,
         subColor: "#666666"
     },
-
+    
 };
 
 // INTRODUZIR DADOS RESPEITAR ORDEM HTML
 var target = document.getElementById('wordGauge');
+
 var target = document.getElementById('Emoji_Power');
 var target = document.getElementById('Data_Power');
 var target = document.getElementById('Info_Power');
+
 var target = document.getElementById('Emoji_Ignition');
 var target = document.getElementById('Data_Ignition');
 var target = document.getElementById('Info_Ignition');
+
 var target = document.getElementById('Emoji_CANh');
 var target = document.getElementById('Data_CANh');
 var target = document.getElementById('Info_CANh');
+
 var target = document.getElementById('Emoji_CANl');
 var target = document.getElementById('Data_CANl');
 var target = document.getElementById('Info_CANl');
+
 var target = document.getElementById('Emoji_CAN');
 var target = document.getElementById('Data_CAN');
 var target = document.getElementById('Info_CAN');
+
 var target = document.getElementById('Emoji_GPS');
 var target = document.getElementById('Data_GPS');
 var target = document.getElementById('Info_GPS');
+
 var target = document.getElementById('Emoji_OneWire');
 var target = document.getElementById('Data_OneWire');
 var target = document.getElementById('Info_OneWire');
+
 var target = document.getElementById('Emoji_Temp');
 var target = document.getElementById('Data_Temp');
 var target = document.getElementById('Info_Temp');
+
 var target = document.getElementById('Emoji_Fuel');
 var target = document.getElementById('Data_Fuel');
 var target = document.getElementById('Info_Fuel');
+
 var target = document.getElementById('Emoji_Door');
 var target = document.getElementById('Data_Door');
 var target = document.getElementById('Info_Door');
+
 var target = document.getElementById('Emoji_Panic');
 var target = document.getElementById('Data_Panic');
 var target = document.getElementById('Info_Panic');
+
 var target = document.getElementById('Emoji_UDB');
 var target = document.getElementById('Data_UDB');
 var target = document.getElementById('Info_UDB');
+
 var target = document.getElementById('Emoji_SI');
 var target = document.getElementById('Data_SI');
 var target = document.getElementById('Info_SI');
+
 var target = document.getElementById('Emoji_Immo');
 var target = document.getElementById('Data_Immo');
 var target = document.getElementById('Info_Immo');
+
 var target = document.getElementById('Emoji_BOut');
 var target = document.getElementById('Data_BOut');
 var target = document.getElementById('Info_BOut');
+
 var target = document.getElementById('Emoji_BIn');
 var target = document.getElementById('Data_BIn');
 var target = document.getElementById('Info_BIn');
+
 var target = document.getElementById('Data_Time');
 
 var target = document.getElementById('potGauge');
@@ -152,7 +169,6 @@ function gatherData(){
         wordPercent = parseInt(parseInt(data.word_value));
         gauge.set(wordPercent);
         $('#wordValue').html(wordPercent);
-        
         // INTRODUZIR DADOS RESPEITAR ORDEM HTML
         $('#Data_Power').html(data.Data_Power);
         $('#Data_Ignition').html(data.Data_Ignition);

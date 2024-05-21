@@ -1,180 +1,180 @@
 <!doctype html>
 <html lang="pt">
-    
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Raspberry Pico W</title>
-        <link rel="icon" href="/Assets//IMG//favicon.ico" type="image/x-icon">
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
-        <link rel="stylesheet" href="/Assets//CSS//api_full_css.css" type="text/css">
-    </head>
-    
-    <body>
-        <div class="container text-center my-2">
-            <div class="row">
-                <div class="col">
-                    <h1>&#128295; Electronic Diagnostics</h1>
-                </div>
-            </div>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Raspberry Pico W</title>
+    <link rel="icon" href="/Assets//IMG//favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+    <link rel="stylesheet" href="/Assets//CSS//api_full.css" type="text/css">
+  </head>
+  
+  <body>
+    <div class="container text-center my-2">
+      <div class="row">
+        <div class="col">
+          <h2>&#128295; Electronic Diagnostics</h2>
         </div>
-        <div class="row">
-          <div class="column">
-            <div class="card">
-              <h4>Power <button type="button" onclick="SetSwitch('Power')"><div id="Emoji_Power">&#128275;</div></button></h4>
-              <h2><div id="Data_Power">&#128257;</div></h2>
-              <p><div id="Info_Power">Scanning</div></p>
-            </div>
-          </div>
-          <div class="column">
-            <div class="card">
-              <h4>Ignition <button type="button" onclick="SetSwitch('Ignition')"><div id="Emoji_Ignition">&#128275;</div></button></h4>
-              <h2><div id="Data_Ignition">&#128257;</div></h2>
-              <p><div id="Info_Ignition">Scanning</div></p>
-            </div>
-          </div>
-          <div class="column">
-            <div class="card">
-              <h4>CAN High <button type="button" onclick="SetSwitch('CANh')"><div id="Emoji_CANh">&#128275;</div></button></h4>
-              <h2><div id="Data_CANh">&#128257;</div></h2>
-              <p><div id="Info_CANh">Scanning</div></p>
-            </div>
-          </div>
-          <div class="column">
-            <div class="card">
-              <h4>CAN Low <button type="button" onclick="SetSwitch('CANl')"><div id="Emoji_CANl">&#128275;</div></button></h4>
-              <h2><div id="Data_CANl">&#128257;</div></h2>
-              <p><div id="Info_CANl">Scanning</div></p>
-            </div>
-          </div>
-        </div>
-        <p></p>
-        <div class="row">
-          <div class="column">
-            <div class="card">
-              <h4>CANBUS <button type="button" onclick="SetSwitch('CAN')"><div id="Emoji_CAN">&#128275;</div></button></h4>
-              <h2><div id="Data_CAN">&#128257;</div></h2>
-              <p><div id="Info_CAN">Scanning</div></p>
-            </div>
-          </div>
-          <div class="column">
-            <div class="card">
-              <h4>GPS <button type="button" onclick="SetSwitch('GPS')"><div id="Emoji_GPS">&#128275;</div></button></h4>
-              <h2><div id="Data_GPS">&#128257;</div></h2>
-              <p><div id="Info_GPS">Scanning</div></p>
-            </div>
-          </div>
-          <div class="column">
-            <div class="card">
-              <h4>OneWire Tag <button type="button" onclick="SetSwitch('OneWire')"><div id="Emoji_OneWire">&#128275;</div></button></h4>
-              <h2><div id="Data_OneWire">&#128257;</div></h2>
-              <p><div id="Info_OneWire">Scanning</div></p>
-            </div>
-          </div>
-          <div class="column">
-            <div class="card">
-              <h4>OneWire Temperature <button type="button" onclick="SetSwitch('Temp')"><div id="Emoji_Temp">&#128275;</div></button></h4>
-              <h2><div id="Data_Temp">&#128257;</div></h2>
-              <p><div id="Info_Temp">Scanning</div></p>
-            </div>
-          </div>
       </div>
-      <p></p>
-        <div class="row">
-            <div class="column">
-              <div class="card">
-                <h4>Fuel Level <button type="button" onclick="SetSwitch('Fuel')"><div id="Emoji_Fuel">&#128275;</div></button></h4>
-                <h2><div id="Data_Fuel">&#128257;</div></h2>
-                <p><div id="Info_Fuel">Scanning</div></p>
-              </div>
-            </div>
-            <div class="column">
-              <div class="card">
-                <h4>Door Sensor <button type="button" onclick="SetSwitch('Door')"><div id="Emoji_Door">&#128275;</div></button></h4>
-                <h2><div id="Data_Door">&#128257;</div></h2>
-                <p><div id="Info_Door">Scanning</div></p>
-              </div>
-            </div>
-            <div class="column">
-              <div class="card">
-                <h4>Panic Button <button type="button" onclick="SetSwitch('Panic')"><div id="Emoji_Panic">&#128275;</div></button></h4>
-                <h2><div id="Data_Panic">&#128257;</div></h2>
-                <p><div id="Info_Panic">Scanning</div></p>
-              </div>
-            </div>
-            <div class="column">
-              <div class="card">
-                <h4>Unauthorized Driver Button <button type="button" onclick="SetSwitch('UDB')"><div id="Emoji_UDB">&#128275;</div></button></h4>
-                <h2><div id="Data_UDB">&#128257;</div></h2>
-                <p><div id="Info_UDB">Scanning</div></p>
-              </div>
-            </div>
+    </div>
+    
+    <div class="row my-2">
+      <div class="column">
+        <div class="card">
+          <h4>Power <button type="button" onclick="SetSwitch('Power')"><div id="Emoji_Power">&#128275;</div></button></h4>
+          <h2><div id="Data_Power">&#128257;</div></h2>
+          <p><div id="Info_Power">Scanning</div></p>
         </div>
-        <p></p>
-        <div class="row">
-            <div class="column">
-              <div class="card">
-                <h4>Start Inhibit <button type="button" onclick="SetSwitch('SI')"><div id="Emoji_SI">&#128275;</div></button></h4>
-                <h2><div id="Data_SI">&#128273;</div></h2>
-                <p><div id="Info_SI">Unlocked</div></p>
-              </div>
-            </div>
-            <div class="column">
-              <div class="card">
-                <h4>Immobilization <button type="button" onclick="SetSwitch('Immo')"><div id="Emoji_Immo">&#128275;</div></button></h4>
-                <h2><div id="Data_Immo">&#128273;</div></h2>
-                <p><div id="Info_Immo">Unlocked</div></p>
-              </div>
-            </div>
-            <div class="column">
-              <div class="card">
-                <h4>Buzzer Out <button type="button" onclick="SetSwitch('BOut')"><div id="Emoji_BOut">&#128277;</div></button></h4>
-                <h2><div id="Data_BOut">&#128264;</div></h2>
-                <p><div id="Info_BOut">Buzzer Off</div></p>
-              </div>
-            </div>
-            <div class="column">
-              <div class="card">
-                <h4>Buzzer In <button type="button" onclick="SetSwitch('BIn')"><div id="Emoji_BIn">&#128277;</div></button></h4>
-                <h2><div id="Data_BIn">&#128264;</div></h2>
-                <p><div id="Info_BIn">Buzzer Off</div></p>
-              </div>
-            </div>
+      </div>
+      <div class="column">
+        <div class="card">
+          <h4>Ignition <button type="button" onclick="SetSwitch('Ignition')"><div id="Emoji_Ignition">&#128275;</div></button></h4>
+          <h2><div id="Data_Ignition">&#128257;</div></h2>
+          <p><div id="Info_Ignition">Scanning</div></p>
         </div>
-        <p></p>
-        <div class="row">
-            <div class="column">
-              <div class="card">
-                <h5>Internal Battety</h5>
-                <p><canvas id="potGauge"></canvas></p>
-              </div>
-            </div>
-            <div class="column">
-              <div class="card">
-                <h5>Internal Temperature</h5>
-                <p><canvas id="tempGauge"></canvas></p>
-              </div>
-            </div>
-            <div class="column">
-              <div class="card">
-                <h5>&#128223; Control Panel</h5>
-                <h4>Reboot <button type="button" onclick="SetSwitch('Reboot')">&#128243;</button></h4>
-                <h4>Power <button type="button" onclick="SetSwitch('POff')">&#128244;</button></h4>
-              </div>
-            </div>
-            <div class="column">
-              <div class="card">
-                <h5>&#128187; Python Developer</h5>
-                <p>Manuel Pereira</p>
-                <h5>2024 v1.0</h5>
-                <h6><div id="Data_Time">&#128257;</div></h6>
-              </div>
-            </div>
+      </div>
+      <div class="column">
+        <div class="card">
+          <h4>CAN High <button type="button" onclick="SetSwitch('CANh')"><div id="Emoji_CANh">&#128275;</div></button></h4>
+          <h2><div id="Data_CANh">&#128257;</div></h2>
+          <p><div id="Info_CANh">Scanning</div></p>
         </div>
-        <p></p>
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
-    </body>
-    <script src="https://code.jquery.com/jquery-3.6.3.min.js"></script>
-    <script src="/Assets//JS//gauge.min.js"></script>
-    <script src="/Assets//JS//api_full_js.js"></script>
-</html>
+      </div>
+      <div class="column">
+        <div class="card">
+          <h4>CAN Low <button type="button" onclick="SetSwitch('CANl')"><div id="Emoji_CANl">&#128275;</div></button></h4>
+          <h2><div id="Data_CANl">&#128257;</div></h2>
+          <p><div id="Info_CANl">Scanning</div></p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="row my-2">
+      <div class="column">
+        <div class="card">
+          <h4>CANBUS <button type="button" onclick="SetSwitch('CAN')"><div id="Emoji_CAN">&#128275;</div></button></h4>
+          <h2><div id="Data_CAN">&#128257;</div></h2>
+          <p><div id="Info_CAN">Scanning</div></p>
+        </div>
+      </div>
+      <div class="column">
+        <div class="card">
+          <h4>GPS <button type="button" onclick="SetSwitch('GPS')"><div id="Emoji_GPS">&#128275;</div></button></h4>
+          <h2><div id="Data_GPS">&#128257;</div></h2>
+          <p><div id="Info_GPS">Scanning</div></p>
+        </div>
+      </div>
+      <div class="column">
+        <div class="card">
+          <h4>OneWire Tag <button type="button" onclick="SetSwitch('OneWire')"><div id="Emoji_OneWire">&#128275;</div></button></h4>
+          <h2><div id="Data_OneWire">&#128257;</div></h2>
+          <p><div id="Info_OneWire">Scanning</div></p>
+        </div>
+      </div>
+      <div class="column">
+        <div class="card">
+          <h4>OneWire Temperature <button type="button" onclick="SetSwitch('Temp')"><div id="Emoji_Temp">&#128275;</div></button></h4>
+          <h2><div id="Data_Temp">&#128257;</div></h2>
+          <p><div id="Info_Temp">Scanning</div></p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="row my-2">
+      <div class="column">
+        <div class="card">
+          <h4>Fuel Level <button type="button" onclick="SetSwitch('Fuel')"><div id="Emoji_Fuel">&#128275;</div></button></h4>
+          <h2><div id="Data_Fuel">&#128257;</div></h2>
+          <p><div id="Info_Fuel">Scanning</div></p>
+        </div>
+      </div>
+      <div class="column">
+        <div class="card">
+          <h4>Door Sensor <button type="button" onclick="SetSwitch('Door')"><div id="Emoji_Door">&#128275;</div></button></h4>
+          <h2><div id="Data_Door">&#128257;</div></h2>
+          <p><div id="Info_Door">Scanning</div></p>
+        </div>
+      </div>
+      <div class="column">
+        <div class="card">
+          <h4>Panic Button <button type="button" onclick="SetSwitch('Panic')"><div id="Emoji_Panic">&#128275;</div></button></h4>
+          <h2><div id="Data_Panic">&#128257;</div></h2>
+          <p><div id="Info_Panic">Scanning</div></p>
+        </div>
+      </div>
+      <div class="column">
+        <div class="card">
+          <h4>Unauthorized Driver Button <button type="button" onclick="SetSwitch('UDB')"><div id="Emoji_UDB">&#128275;</div></button></h4>
+          <h2><div id="Data_UDB">&#128257;</div></h2>
+          <p><div id="Info_UDB">Scanning</div></p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="row my-2">
+      <div class="column">
+        <div class="card">
+          <h4>Start Inhibit <button type="button" onclick="SetSwitch('SI')"><div id="Emoji_SI">&#128275;</div></button></h4>
+          <h2><div id="Data_SI">&#128273;</div></h2>
+          <p><div id="Info_SI">Unlocked</div></p>
+        </div>
+      </div>
+      <div class="column">
+        <div class="card">
+          <h4>Immobilization <button type="button" onclick="SetSwitch('Immo')"><div id="Emoji_Immo">&#128275;</div></button></h4>
+          <h2><div id="Data_Immo">&#128273;</div></h2>
+          <p><div id="Info_Immo">Unlocked</div></p>
+        </div>
+      </div>
+      <div class="column">
+        <div class="card">
+          <h4>Buzzer Out <button type="button" onclick="SetSwitch('BOut')"><div id="Emoji_BOut">&#128277;</div></button></h4>
+          <h2><div id="Data_BOut">&#128264;</div></h2>
+          <p><div id="Info_BOut">Buzzer Off</div></p>
+        </div>
+      </div>
+      <div class="column">
+        <div class="card">
+          <h4>Buzzer In <button type="button" onclick="SetSwitch('BIn')"><div id="Emoji_BIn">&#128277;</div></button></h4>
+          <h2><div id="Data_BIn">&#128264;</div></h2>
+          <p><div id="Info_BIn">Buzzer Off</div></p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="row my-2">
+      <div class="column">
+        <div class="card">
+          <h5>Internal Battety</h5>
+          <p><canvas id="potGauge"></canvas></p>
+        </div>
+      </div>
+      <div class="column">
+        <div class="card">
+          <h5>Internal Temperature</h5>
+          <p><canvas id="tempGauge"></canvas></p>
+        </div>
+      </div>
+      <div class="column">
+        <div class="card">
+          <h5>&#128223; Control Panel</h5>
+          <h4>Reboot <button type="button" onclick="SetSwitch('Reboot')">&#128243;</button></h4>
+          <h4>Power <button type="button" onclick="SetSwitch('POff')">&#128244;</button></h4>
+        </div>
+      </div>
+      <div class="column">
+        <div class="card">
+          <h5>&#128187; Python Developer</h5>
+          <p>Manuel Pereira</p>
+          <h5>2024 v1.0</h5>
+          <h6><div id="Data_Time">&#128257;</div></h6>
+        </div>
+      </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
+  </body>
+  <script src="https://code.jquery.com/jquery-3.6.3.min.js"></script>
+  <script src="/Assets//JS//gauge.min.js"></script>
+  <script src="/Assets//JS//api_full.js"></script>
+</hml>

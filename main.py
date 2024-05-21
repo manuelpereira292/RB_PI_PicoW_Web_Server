@@ -104,6 +104,7 @@ async def handle_request(reader, writer):
         await writer.drain()
         await writer.wait_closed()
     
+    
     except OSError as _e1:
         print('OSError: ', _e1)
     except UnicodeError:

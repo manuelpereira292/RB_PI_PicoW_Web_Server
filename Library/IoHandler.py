@@ -456,7 +456,7 @@ class IoHandler:
         _value = str(round(_value, 2)) + 'V'
         """
         cls.dict_data['Battery'] = cls.battery.read_u16()        
-    
+
 
     @classmethod
     def Set_Temperature_Reading(cls):
