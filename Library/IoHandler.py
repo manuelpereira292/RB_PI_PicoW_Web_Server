@@ -20,7 +20,7 @@ class IoHandler:
     # EWT Switch
     ewt = Pin(19, Pin.IN, Pin.PULL_UP)
     # DID / RFID / Temperature
-    did = Pin(21)
+    did = Pin(0)
     # create the onewire object
     ow = onewire.OneWire(did)
     # create the ds18x20 object
@@ -74,36 +74,36 @@ class IoHandler:
         'Ignition': True,
         'CANh': True,
         'CANl': True,
-        'CAN': True,
-        'GPS': True,
-        'OneWire': True,
-        'Temp': True,
-        'Fuel': True,
-        'Door': True,
-        'Panic': True,
-        'UDB': True,
+        'CAN': False,
+        'GPS': False,
+        'OneWire': False,
+        'Temp': False,
+        'Fuel': False,
+        'Door': False,
+        'Panic': False,
+        'UDB': False,
         'SI': True,
         'Immo': True,
         'BOut': False,
-        'BIn': False}
+        'BIn': True}
 
     dict_data = {
         'Power': emoji_scanning,
         'Ignition': emoji_scanning,
         'CANh': emoji_scanning,
         'CANl': emoji_scanning,
-        'CAN': emoji_scanning,
-        'GPS': emoji_scanning,
-        'OneWire': emoji_scanning,
-        'Temp': emoji_scanning,
-        'Fuel': emoji_scanning,
-        'Door': emoji_scanning,
-        'Panic': emoji_scanning,
-        'UDB': emoji_scanning,
+        'CAN': emoji_stop,
+        'GPS': emoji_stop,
+        'OneWire': emoji_stop,
+        'Temp': emoji_stop,
+        'Fuel': emoji_stop,
+        'Door': emoji_stop,
+        'Panic': emoji_stop,
+        'UDB': emoji_stop,
         'SI': emoji_key,
         'Immo': emoji_key,
         'BOut': emoji_buzzer_off,
-        'BIn': emoji_buzzer_off,
+        'BIn': emoji_buzzer_on,
         'Battery': 0,
         'Temperature': 0,
         'Time': ''}
@@ -113,36 +113,41 @@ class IoHandler:
         'Ignition': 'Scanning',
         'CANh': 'Scanning',
         'CANl': 'Scanning',
-        'CAN': 'Scanning',
-        'GPS': 'Scanning',
-        'OneWire': 'Scanning',
-        'Temp': 'Scanning',
-        'Fuel': 'Scanning',
-        'Door': 'Scanning',
-        'Panic': 'Scanning',
-        'UDB': 'Scanning',
+        'CAN': 'Blocked',
+        'GPS': 'Blocked',
+        'OneWire': 'Blocked',
+        'Temp': 'Blocked',
+        'Fuel': 'Blocked',
+        'Door': 'Blocked',
+        'Panic': 'Blocked',
+        'UDB': 'Blocked',
         'SI': 'Unlocked',
         'Immo': 'Unlocked',
         'BOut': 'Buzzer Off',
-        'BIn': 'Buzzer Off'}
+        'BIn': 'Buzzer On'}
 
     dict_emoji = {
         'Power': emoji_open,
         'Ignition': emoji_open,
         'CANh': emoji_open,
         'CANl': emoji_open,
-        'CAN': emoji_open,
-        'GPS': emoji_open,
-        'OneWire': emoji_open,
-        'Temp': emoji_open,
-        'Fuel': emoji_open,
-        'Door': emoji_open,
-        'Panic': emoji_open,
-        'UDB': emoji_open,
+        'CAN': emoji_close,
+        'GPS': emoji_close,
+        'OneWire': emoji_close,
+        'Temp': emoji_close,
+        'Fuel': emoji_close,
+        'Door': emoji_close,
+        'Panic': emoji_close,
+        'UDB': emoji_close,
         'SI': emoji_open,
         'Immo': emoji_open,
         'BOut': emoji_no_buzzer,
-        'BIn': emoji_no_buzzer}
+        'BIn': emoji_buzzer}
+
+    list_onew = list()
+    list_wire = [0, 0, 0, 0]
+    list_temp = [0, 0, 0, 0]
+    timer = 0
 
 
     # Get everything into a starting state
@@ -298,7 +303,7 @@ class IoHandler:
                     cls.dict_data['CAN'] = cls.emoji_can_found + ' Can Found'
                     _value = ubinascii.hexlify(_value, ' ')
                     with open('/Logs/can.txt', 'a') as outfile:
-                        outfile.write(cls.get_time_reading() + '\n' + str(_value) + '\r\n')
+                        outfile.write(cls.Get_Time_Reading() + '\n' + str(_value) + '\r\n')
             except UnicodeError:
                 pass
         else:
@@ -345,7 +350,7 @@ class IoHandler:
                                     pass
                                 else:
                                     with open('/Logs/gps.txt', 'a') as outfile:
-                                        outfile.write(cls.get_time_reading() + ' ' + str(x) + '_FAILL -> ' + _value[x] + '\n')
+                                        outfile.write(cls.Get_Time_Reading() + ' ' + str(x) + '_FAILL -> ' + _value[x] + '\n')
             except UnicodeError:
                 pass
         
@@ -363,45 +368,48 @@ class IoHandler:
     @classmethod
     def Set_OneWire_Reading(cls):
         if cls.dict_lock['OneWire']:
+            cls.dict_data['OneWire'] = cls.emoji_scanning
             ow_info = cls.ow.scan() # OneWire
-            ow_list = []
-            ds_info = cls.ds.scan() # DS18x20
-            ds_list = []
-            temp_list = []
-            try:
-                if ow_info != []:
-                    for _ow in range(len(ow_info)):
-                        ow_list.append(cls.decode_onewire(ow_info[_ow]))
-                if ds_info != []:
-                    for _ow in range(len(ds_info)):
-                        ds_list.append(cls.decode_onewire(ds_info[_ow]))
-                        cls.ds.convert_temp()
-                        time.sleep_ms(750) # min of 750ms for OneWire conversion
-                        temp_list.append(str(cls.ds.read_temp(ds_info[_ow])))
-            except:
-                pass
-            
-            try:
-                x = set(ow_list) & set(ds_list)
-                if len(x) == 0:
-                    cls.dict_data['Temp']= cls.emoji_scanning
-                else:
-                    cls.dict_data['Temp'] = (str(len(x)) + 'S -> ' + ' / '.join(temp_list))
-                    #with open('/Logs/ds18x20.txt', 'a') as outfile:
-                    #    outfile.write(cls.get_time_reading() + ' ' + str(ds_list) + ' ' + cls.ds18x20Value + '\n')
-
-                y = set(ow_list) ^ set(ds_list)
-                if len(y) == 0:
+            if ow_info != []:
+                cls.list_onew.clear()
+                for _ow in range(len(ow_info)):
+                    cls.list_onew.append(cls.Decode_OneWire(ow_info[_ow]))
+                cls.dict_data['OneWire'] = [x for x in cls.list_onew if not x in cls.list_wire]
+                if cls.dict_data['OneWire'] == []:
                     cls.dict_data['OneWire'] = cls.emoji_scanning
                 else:
-                    cls.dict_data['OneWire'] = ''.join(y)
-                    #with open('/Logs/onewire.txt', 'a') as outfile:
-                    #    outfile.write(cls.get_time_reading() + ' ' + cls.onewireValue + '\n')
                     cls.buzzer_out_play()
-            except:
-                pass
         else:
             cls.dict_data['OneWire'] = cls.emoji_stop
+
+
+    @classmethod
+    def Set_Temp_Reading(cls):
+        if cls.dict_lock['Temp']:
+            if cls.timer == 0:
+                cls.timer = 4
+                cls.dict_data['Temp'] = cls.emoji_scanning
+                ds_info = cls.ds.scan() # DS18x20
+                if ds_info != []:
+                    _value = len(ds_info)
+                    for _ds in range(_value):
+                        cls.list_wire[_ds] = cls.Decode_OneWire(ds_info[_ds])
+                        cls.list_temp[_ds] = cls.Convert_OneWire(ds_info[_ds])
+                    try:
+                        if _value == 1:
+                            cls.dict_data['Temp'] = cls.emoji_first + cls.list_temp[0]
+                        elif _value == 2:
+                            cls.dict_data['Temp'] = cls.emoji_first + cls.list_temp[0] + cls.emoji_second + cls.list_temp[1]
+                        elif _value == 3:
+                            cls.dict_data['Temp'] = cls.emoji_first + cls.list_temp[0] + cls.emoji_second + cls.list_temp[1] + cls.emoji_third + cls.list_temp[2]
+                        elif _value == 4:
+                            cls.dict_data['Temp'] = cls.list_temp[0] + cls.emoji_first + cls.list_temp[1] + cls.emoji_second + cls.list_temp[2] + cls.emoji_third + cls.list_temp[3]
+                    except:
+                        pass
+            else:
+                cls.timer -= 1
+        else:
+            cls.dict_data['Temp'] = cls.emoji_stop
 
 
     @classmethod
@@ -474,9 +482,10 @@ class IoHandler:
     @classmethod
     def Set_Switches_Reading(cls, value):
         status = 'OK'
-        cls.buzzer_in.value(1)
-        time.sleep_ms(50)
-        cls.buzzer_in.value(0)
+        if cls.dict_lock['BIn']:
+            cls.buzzer_in.value(1)
+            time.sleep_ms(50)
+            cls.buzzer_in.value(0)
         if value == 'Power':
             cls.dict_lock['Power'] = not cls.dict_lock['Power']
             if cls.dict_lock['Power']:
@@ -615,12 +624,10 @@ class IoHandler:
                 cls.dict_emoji['BIn'] = cls.emoji_buzzer
                 cls.dict_data['BIn'] = cls.emoji_buzzer_on
                 cls.dict_info['BIn'] = 'Buzzer On'
-                cls.buzzer_in.value(1)
             else:
                 cls.dict_emoji['BIn'] = cls.emoji_no_buzzer
                 cls.dict_data['BIn'] = cls.emoji_buzzer_off
                 cls.dict_info['BIn'] = 'Buzzer Off'
-                cls.buzzer_in.value(0)
         elif value == 'Reboot':
             raise RuntimeError
         elif value == 'POff':
@@ -635,20 +642,37 @@ class IoHandler:
 
 
     @classmethod
-    def decode_onewire(cls, info):
+    def Decode_OneWire(cls, info):
+        """
+        info: bytearray
+        return: 16 bits name
+        """
         byte_var = binascii.hexlify(info).decode().upper()
         if len(byte_var) == 16:
             count = 14
-            m_list = []
-            for _l in range(0, 8, 1):
-                ml = byte_var[count:count+2]
+            _list = []
+            for _value in range(0, 8, 1):
+                _list.append(byte_var[count:count+2])
                 count -= 2
-                m_list.append(ml)
-            m_list = ''.join(m_list)
-            return m_list
+            return ''.join(_list)
         else:
             print('Found OneWire devices with 16 bits error')
-            return None
+            return '16 bits error'
+
+
+    @classmethod
+    def Convert_OneWire(cls, info):
+        """
+        info: bytearray
+        return: temperature
+        """
+        try:
+            cls.ds.convert_temp()
+            time.sleep_ms(750) # min of 750ms for OneWire conversion
+            _value = cls.ds.read_temp(info)
+            return str(round(_value, 1))
+        except:
+            pass
 
 
     @classmethod

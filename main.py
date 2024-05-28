@@ -1,5 +1,5 @@
 # Using asyncio for non blocking web server
-import uasyncio, sys # type: ignore
+import machine, uasyncio, sys # type: ignore
 from Library.WiFiConnection import WiFiConnection
 from Library.RequestParser import RequestParser
 from Library.ResponseBuilder import ResponseBuilder
@@ -105,12 +105,15 @@ async def handle_request(reader, writer):
         await writer.wait_closed()
     
     
-    except OSError as _e1:
-        print('OSError: ', _e1)
+    except OSError as _error:
+        print('OSError: ', _error)
     except UnicodeError:
         pass
     except MemoryError:
-        pass
+        print('Memory error')
+        IoHandler.buzzer_in_play()
+        IoHandler.led.off()
+        machine.reset()
     except KeyboardInterrupt:
         print('Power button')
         IoHandler.buzzer_in_play()
@@ -120,11 +123,48 @@ async def handle_request(reader, writer):
         print('Reboot button')
         IoHandler.buzzer_in_play()
         IoHandler.led.off()
-        IoHandler.machine.reset()
+        machine.reset()
 
 
-# coroutine that will run as the neopixel update task
-async def neopixels():
+# Coroutine that will run as the neopixel update task
+async def task_01():
+    counter = 0
+    while True:
+        if counter % 1000 == 0:
+            IoHandler.Set_CAN_Reading()
+            IoHandler.Set_GPS_Reading()
+        counter += 1
+        # 0 second pause to allow other tasks to run
+        await uasyncio.sleep(0)
+
+
+# Coroutine that will run as the neopixel update task
+async def task_02():
+    counter = 0
+    while True:
+        if counter % 1000 == 0:
+            IoHandler.Set_OneWire_Reading()
+            IoHandler.Set_Temp_Reading()
+        counter += 1
+        # 0 second pause to allow other tasks to run
+        await uasyncio.sleep(0)
+
+
+# main coroutine to boot async tasks
+async def main():
+    # start web server task
+    print('Setting up webserver...')
+    server = uasyncio.start_server(handle_request, "0.0.0.0", 80)
+    uasyncio.create_task(server)
+    
+    IoHandler.buzzer_in_play()
+    IoHandler.led.on()
+
+    # Start updating other tasks
+    uasyncio.create_task(task_01())
+    uasyncio.create_task(task_02())
+    
+    # Main task control loop
     counter = 0
     while True:
         if counter % 1000 == 0:
@@ -139,37 +179,13 @@ async def neopixels():
             IoHandler.Set_Battery_Reading()
             IoHandler.Set_Temperature_Reading()
             IoHandler.Set_Time_Reading()
-
         counter += 1
         # 0 second pause to allow other tasks to run
         await uasyncio.sleep(0)
 
-
-# main coroutine to boot async tasks
-async def main():
-    # start web server task
-    print('Setting up webserver...')
-    server = uasyncio.start_server(handle_request, "0.0.0.0", 80)
-    uasyncio.create_task(server)
-    IoHandler.buzzer_in_play()
-    IoHandler.led.on()
-
-    # start top 4 neopixel updating task
-    uasyncio.create_task(neopixels())
-    # main task control loop pulses red led
-    counter = 0
-    while True:
-        if counter % 1000 == 0:
-            IoHandler.Set_CAN_Reading()
-            IoHandler.Set_GPS_Reading()
-            IoHandler.Set_OneWire_Reading()
-        counter += 1
-        # 0 second pause to allow other tasks to run
-        await uasyncio.sleep(0)
-
-# start asyncio task and loop
+# Start asyncio task and loop
 try:
-    # start the main async tasks
+    # Start the main async tasks
     uasyncio.run(main())
 except KeyboardInterrupt:
     print('Stop button')
@@ -177,5 +193,5 @@ except KeyboardInterrupt:
     IoHandler.led.off()
     sys.exit()
 finally:
-    # reset and start a new event loop for the task scheduler
+    # Reset and start a new event loop for the task scheduler
     uasyncio.new_event_loop()

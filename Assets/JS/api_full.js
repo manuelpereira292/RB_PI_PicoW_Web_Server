@@ -226,7 +226,6 @@ function SetSwitch(value) {
     "value": value,
     };
     $.post( "/api", postData, function( data ) {
-        console.log(data);
         $('#Emoji_Power').html(data.Emoji_Power);
         $('#Info_Power').html(data.Info_Power);
         $('#Emoji_Ignition').html(data.Emoji_Ignition);
@@ -281,8 +280,6 @@ function set_rgb_colour(color) {
     rgb_ajax_in_progress = true;
     
     $.post( "/api", postData, function( data ) {
-        console.log(data);
-        
         rgb_ajax_in_progress = false // allow next call
     });
 }
